@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #e8f5e9;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px; /* Increased from 1000px to 1200px */
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            color: #2e7d32;
+            text-align: center;
+            font-size: 2.4em;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Increased from 220px to 280px */
+            gap: 20px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #e0e0e0;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        .card-header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .card-link {
+            display: block;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9em;
+        }
+        .card-link:hover {
+            background-color: #45a049;
+        }
+        .card-icon {
+            font-size: 2.5em;
+            text-align: center;
+            margin-bottom: 12px;
+            color: #4CAF50;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            font-size: 0.8em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="margin-top: 10px;">Hospital Management Dashboard</h1>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">Employees</div>
+                <div class="card-body">
+                    <div class="card-icon"><i class="fas fa-users"></i></div>
+                    <p>Manage hospital staff, including nurses, technicians, 
+                        and administrative personnel.
+                    </p>
+                    <div class="stats">
+                        <span><i class="fas fa-user-nurse"></i> 
+                            {{ employees_count }} Employees
+                        </span>
+                    </div>
+                </div>
+                <a href="{% url 'employee_list' %}" class="card-link">
+                    View All Employees
+                </a>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">Doctors</div>
+                <div class="card-body">
+                    <div class="card-icon"><i class="fas fa-user-md"></i></div>
+                    <p>Access information about doctors, their specialties, 
+                        and schedules.
+                    </p>
+                    <div class="stats">
+                        <span><i class="fas fa-stethoscope"></i> 
+                            {{doctors_count}} Doctors
+                        </span>
+                    </div>
+                </div>
+                <a href="{% url 'doctor_list' %}" class="card-link">View All Doctors</a>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">Patients</div>
+                <div class="card-body">
+                    <div class="card-icon"><i class="fas fa-procedures"></i></div>
+                    <p>Access and manage patient records, medical histories, 
+                        and treatments.
+                    </p>
+                    <div class="stats">
+                        <span><i class="fas fa-bed"></i> 
+                            {{patients_count}} Patients
+                        </span>
+                    </div>
+                </div>
+                <a href="{% url 'patient_list' %}" class="card-link">
+                    View All Patients
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Appointments</div>
+                <div class="card-body">
+                    <div class="card-icon"><i class="far fa-calendar-check"></i></div>
+                    <p>Manage and view upcoming appointments, schedules, 
+                        and patient visits.
+                    </p>
+                    <div class="stats">
+                        <span><i class="fas fa-calendar-week"></i> 
+                            {{appointments_count}} Appointments
+                        </span>
+                    </div>
+                </div>
+                <a href="{% url 'appointment_list' %}" class="card-link">
+                    View All Appointments
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee Detail</title>
+    <style>
+        body {
+            background-color: #f0f8ff;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #4CAF50;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .employee-photo {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            display: block;
+            margin: 0 auto 20px;
+        }
+        .no-photo {
+            width: 150px;
+            height: 150px;
+            background-color: #ddd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 16px;
+            margin: 0 auto 20px;
+        }
+        p {
+            font-size: 18px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        a {
+            display: inline-block;
+            margin: 10px 5px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+        a:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ employee.first_name }} {{ employee.last_name }}</h1>
+        {% if employee.photo %}
+            <img src="{{ employee.photo.url }}" alt="{{ employee.first_name }} {{ employee.last_name }}" class="employee-photo">
+        {% else %}
+            <div class="no-photo">No photo available</div>
+        {% endif %}
+        <p>Position: {{ employee.position }}</p>
+        <p>Department: {{ employee.department }}</p>
+        <p>Phone Number: {{ employee.phone_number }}</p>
+        <p>Email: {{ employee.email }}</p>
+        <div class="button-container">
+            <a href="{% url 'employee_edit' employee.pk %}">Edit</a>
+            <a href="{% url 'employee_delete' employee.pk %}">Delete</a>
+            <a href="{% url 'employee_list' %}">Back to List</a>
+        </div>
+    </div>
+</body>
+</html>
