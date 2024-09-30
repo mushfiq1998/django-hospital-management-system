@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from .models import Patient, Employee, Doctor, Appointment
-from .forms import PatientForm, EmployeeForm, DoctorForm, AppointmentForm 
+from .forms import PatientForm, EmployeeForm, DoctorForm, AppointmentForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
@@ -12,11 +12,15 @@ from django.contrib import messages
 def dashboard(request):
     employees_count = Employee.objects.count()
     patients_count = Patient.objects.count()
+    indoor_patients_count = Patient.objects.filter(patient_type='indoor').count()
+    outdoor_patients_count = Patient.objects.filter(patient_type='outdoor').count()
     doctors_count = Doctor.objects.count()
     appointments_count = Appointment.objects.count()
     context = {
         'employees_count': employees_count,
         'patients_count': patients_count,
+        'indoor_patients_count': indoor_patients_count,
+        'outdoor_patients_count': outdoor_patients_count,
         'doctors_count': doctors_count,
         'appointments_count': appointments_count,
     }
@@ -67,8 +71,14 @@ def user_logout(request):
 # Patient Views ..........................................................
 @login_required
 def patient_list(request):
-    patients = Patient.objects.all()
-    context = {'patients': patients}
+    patient_type = request.GET.get('type', 'all')
+    if patient_type == 'indoor':
+        patients = Patient.objects.filter(patient_type='indoor')
+    elif patient_type == 'outdoor':
+        patients = Patient.objects.filter(patient_type='outdoor')
+    else:
+        patients = Patient.objects.all()
+    context = {'patients': patients, 'current_type': patient_type}
     return render(request, 'hospital/patient_list.html', context)
 
 @login_required
@@ -114,8 +124,6 @@ def delete_object(request, model, pk, redirect_url):
 @login_required
 def patient_delete(request, pk):
     return delete_object(request, Patient, pk, 'patient_list')
-
-
 
 # .......................................................................
 # Employee Views 
