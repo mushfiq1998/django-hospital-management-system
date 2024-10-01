@@ -37,4 +37,19 @@ urlpatterns = [
     path('appointments/<int:pk>/', views.appointment_detail, name='appointment_detail'),
     path('appointments/<int:pk>/edit/', views.appointment_edit, name='appointment_edit'),
     path('appointments/<int:pk>/delete/', views.appointment_delete, name='appointment_delete'),
+
+    # Ward URLs
+    path('wards/', views.ward_list, name='ward_list'),
+    path('wards/<int:pk>/', views.ward_detail, name='ward_detail'),
+    path('wards/create/', views.ward_create, name='ward_create'),
+    path('wards/<int:pk>/update/', views.ward_update, name='ward_update'),
+    path('wards/<int:pk>/delete/', views.ward_delete, name='ward_delete'),
+
+    # Bed URLs
+    path('beds/', views.bed_list, name='bed_list'),
+    path('beds/<int:pk>/', views.bed_detail, name='bed_detail'),
+    path('beds/create/', views.bed_create, name='bed_create'),
+    path('beds/<int:pk>/update/', views.bed_update, name='bed_update'),
+    path('patients/<int:patient_id>/assign_bed/', views.assign_bed, name='assign_bed'),
+    path('beds/<int:pk>/delete/', views.bed_delete, name='bed_delete'),
 ]

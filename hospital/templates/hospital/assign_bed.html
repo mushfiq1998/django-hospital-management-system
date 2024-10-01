@@ -1,0 +1,14 @@
+{% extends 'hospital/base.html' %}
+
+{% block content %}
+<h2>Assign Bed to {{ patient.name }}</h2>
+<form method="post">
+    {% csrf_token %}
+    <select name="bed_id">
+        {% for bed in available_beds %}
+            <option value="{{ bed.id }}">{{ bed.number }} in {{ bed.ward.name }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Assign Bed</button>
+</form>
+{% endblock %}

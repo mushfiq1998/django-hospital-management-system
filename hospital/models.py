@@ -12,6 +12,14 @@ class Employee(models.Model):
         return f"{self.name} - {self.position}"
 
 
+class Ward(models.Model):
+    name = models.CharField(max_length=100)
+    capacity = models.IntegerField()
+
+    def __str__(self):
+        return self.name
+
+
 class Patient(models.Model):
     PATIENT_TYPES = [
         ('indoor', 'Indoor'),
@@ -32,6 +40,17 @@ class Patient(models.Model):
         return self.name
 
 
+class Bed(models.Model):
+    number = models.CharField(max_length=10)
+    ward = models.ForeignKey(Ward, on_delete=models.CASCADE, related_name='beds')
+    is_occupied = models.BooleanField(default=False)
+    patient = models.OneToOneField(Patient, on_delete=models.SET_NULL, 
+                                   null=True, blank=True, related_name='bed')
+
+    def __str__(self):
+        return f"Bed {self.number} in {self.ward.name}"
+
+
 class Doctor(models.Model):
     name = models.CharField(max_length=200)
     specialization = models.CharField(max_length=100, null=True, blank=True)
@@ -43,8 +62,8 @@ class Doctor(models.Model):
 
 
 class Appointment(models.Model):
-    patient = models.ForeignKey('Patient', on_delete=models.CASCADE)
-    doctor = models.ForeignKey('Doctor', on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     date = models.DateField()
     time = models.TimeField()
     reason = models.TextField()

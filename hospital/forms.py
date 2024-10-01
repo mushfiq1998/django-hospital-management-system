@@ -1,5 +1,5 @@
 from django import forms
-from .models import Patient, Employee, Doctor, Appointment
+from .models import Patient, Employee, Doctor, Appointment, Ward, Bed
 
 class PatientForm(forms.ModelForm):
     class Meta:
@@ -25,3 +25,13 @@ class AppointmentForm(forms.ModelForm):
             'date': forms.DateInput(attrs={'type': 'date'}),
             'time': forms.TimeInput(attrs={'type': 'time'}),
         }
+
+class WardForm(forms.ModelForm):
+    class Meta:
+        model = Ward
+        fields = ['name', 'capacity']
+
+class BedForm(forms.ModelForm):
+    class Meta:
+        model = Bed
+        fields = ['number', 'ward', 'is_occupied', 'patient']

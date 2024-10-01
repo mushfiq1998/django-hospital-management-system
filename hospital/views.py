@@ -1,11 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
-from .models import Patient, Employee, Doctor, Appointment
-from .forms import PatientForm, EmployeeForm, DoctorForm, AppointmentForm
+from .models import Patient, Employee, Doctor, Appointment, Ward, Bed
+from .forms import PatientForm, EmployeeForm, DoctorForm, AppointmentForm, WardForm, BedForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse_lazy
+from django.views.generic import DeleteView
 
 # Dashboard View
 @login_required
@@ -271,3 +274,107 @@ def appointment_edit(request, pk):
 @login_required
 def appointment_delete(request, pk):
     return delete_object(request, Appointment, pk, 'appointment_list')
+
+
+# ......................................................................
+# Ward Views ..........................................................
+@login_required
+def ward_list(request):
+    wards = Ward.objects.all()
+    return render(request, 'hospital/ward_list.html', {'wards': wards})
+
+@login_required
+def ward_detail(request, pk):
+    ward = get_object_or_404(Ward, pk=pk)
+    beds = ward.beds.all()
+    return render(request, 'hospital/ward_detail.html', {'ward': ward, 'beds': beds})
+
+@login_required
+def ward_create(request):
+    if request.method == 'POST':
+        form = WardForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('ward_list')
+    else:
+        form = WardForm()
+    return render(request, 'hospital/ward_form.html', {'form': form})
+
+@login_required
+def ward_update(request, pk):
+    ward = get_object_or_404(Ward, pk=pk)
+    if request.method == 'POST':
+        form = WardForm(request.POST, instance=ward)
+        if form.is_valid():
+            form.save()
+            return redirect('ward_detail', pk=ward.pk)
+    else:
+        form = WardForm(instance=ward)
+    return render(request, 'hospital/ward_form.html', {'form': form})
+
+# Bed Views
+@login_required
+def bed_list(request):
+    beds = Bed.objects.all()
+    return render(request, 'hospital/bed_list.html', {'beds': beds})
+
+@login_required
+def bed_detail(request, pk):
+    bed = get_object_or_404(Bed, pk=pk)
+    return render(request, 'hospital/bed_detail.html', {'bed': bed})
+
+@login_required
+def bed_create(request):
+    if request.method == 'POST':
+        form = BedForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('bed_list')
+    else:
+        form = BedForm()
+    return render(request, 'hospital/bed_form.html', {'form': form})
+
+@login_required
+def bed_update(request, pk):
+    bed = get_object_or_404(Bed, pk=pk)
+    if request.method == 'POST':
+        form = BedForm(request.POST, instance=bed)
+        if form.is_valid():
+            form.save()
+            return redirect('bed_detail', pk=bed.pk)
+    else:
+        form = BedForm(instance=bed)
+    return render(request, 'hospital/bed_form.html', {'form': form})
+
+@login_required
+def assign_bed(request, patient_id):
+    patient = get_object_or_404(Patient, pk=patient_id)
+    if request.method == 'POST':
+        bed_id = request.POST.get('bed_id')
+        bed = get_object_or_404(Bed, pk=bed_id)
+        if not bed.is_occupied:
+            bed.is_occupied = True
+            bed.patient = patient
+            bed.save()
+            patient.bed = bed
+            patient.save()
+            messages.success(request, f"Bed {bed.number} assigned to {patient.name}")
+        else:
+            messages.error(request, "This bed is already occupied")
+        return redirect('patient_detail', pk=patient_id)
+    available_beds = Bed.objects.filter(is_occupied=False)
+    return render(request, 'hospital/assign_bed.html', {'patient': patient, 'available_beds': available_beds})
+
+class WardDeleteView(DeleteView):
+    model = Ward
+    success_url = reverse_lazy('ward_list')
+    template_name = 'hospital/ward_confirm_delete.html'
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+ward_delete = WardDeleteView.as_view()
+
+@login_required
+def bed_delete(request, pk):
+    return delete_object(request, Bed, pk, 'bed_list')

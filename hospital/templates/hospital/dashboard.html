@@ -17,87 +17,90 @@
             color: #333;
         }
         .container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 20px;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 15px;
             background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            box-shadow: 0 0 12px rgba(0,0,0,0.1);
         }
         h1 {
             font-family: 'Montserrat', sans-serif;
             color: #2e7d32;
             text-align: center;
-            font-size: 2.4em;
-            margin-bottom: 30px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
         }
         .card {
             background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
             overflow: hidden;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             border: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
         }
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
         }
         .card-header {
             background-color: #4CAF50;
             color: white;
-            padding: 15px;
-            font-size: 1.2em;
+            padding: 12px;
+            font-size: 1.1em;
             font-weight: bold;
             text-align: center;
         }
         .card-body {
-            padding: 20px;
+            padding: 15px;
+            flex-grow: 1;
         }
         .card-link {
             display: block;
             background-color: #4CAF50;
             color: white;
             text-align: center;
-            padding: 12px;
+            padding: 10px;
             text-decoration: none;
             transition: background-color 0.3s ease;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
-            font-size: 0.9em;
+            font-size: 0.8em;
         }
         .card-link:hover {
             background-color: #45a049;
         }
         .card-icon {
-            font-size: 2.5em;
+            font-size: 2em;
             text-align: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             color: #4CAF50;
         }
         .stats {
             display: flex;
             justify-content: space-around;
-            margin-top: 15px;
-            font-size: 0.8em;
+            margin-top: 12px;
+            font-size: 0.75em;
             color: #4CAF50;
         }
         .logout-link {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 15px;
+            right: 15px;
             background-color: #4CAF50;
             color: white;
-            padding: 10px 15px;
+            padding: 8px 12px;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 4px;
             transition: background-color 0.3s ease;
         }
         .logout-link:hover {
@@ -107,7 +110,7 @@
 </head>
 <body>
     <div class="container">
-        <h1 style="margin-top: 10px;">Hospital Management Dashboard</h1>
+        <h1 style="margin-top: 8px;">Hospital Management Dashboard</h1>
         <a href="{% url 'logout' %}" class="logout-link">Logout</a>
         
         <div class="dashboard-grid">
@@ -133,7 +136,7 @@
                 <div class="card-header">Doctors</div>
                 <div class="card-body">
                     <div class="card-icon"><i class="fas fa-user-md"></i></div>
-                    <p>Access information about doctors, their specialties, 
+                    <p>Manage doctors, their specialties, 
                         and schedules.
                     </p>
                     <div class="stats">
@@ -149,7 +152,7 @@
                 <div class="card-header">Patients</div>
                 <div class="card-body">
                     <div class="card-icon"><i class="fas fa-procedures"></i></div>
-                    <p>Access and manage patient records, medical histories, 
+                    <p>Manage patient records, medical histories, 
                         and treatments.
                     </p>
                     <div class="stats">
@@ -179,6 +182,38 @@
                 <a href="{% url 'appointment_list' %}" class="card-link">
                     View All Appointments
                 </a>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Wards</div>
+                <div class="card-body">
+                    <div class="card-icon"><i class="fas fa-hospital"></i></div>
+                    <p>Manage hospital wards, their capacity, 
+                        and occupancy.
+                    </p>
+                    <div class="stats">
+                        <span><i class="fas fa-door-open"></i> 
+                            {{wards_count}} Wards
+                        </span>
+                    </div>
+                </div>
+                <a href="{% url 'ward_list' %}" class="card-link">View All Wards</a>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Beds</div>
+                <div class="card-body">
+                    <div class="card-icon"><i class="fas fa-bed"></i></div>
+                    <p>Monitor and manage bed availability 
+                        across all wards.
+                    </p>
+                    <div class="stats">
+                        <span><i class="fas fa-procedures"></i> 
+                            {{beds_count}} Beds
+                        </span>
+                    </div>
+                </div>
+                <a href="{% url 'bed_list' %}" class="card-link">View All Beds</a>
             </div>
         </div>
     </div>

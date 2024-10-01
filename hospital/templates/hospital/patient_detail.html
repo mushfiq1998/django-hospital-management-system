@@ -5,4 +5,12 @@
 <p><strong>Name:</strong> {{ patient.name }}</p>
 <p><strong>Type:</strong> {{ patient.get_patient_type_display }}</p>
 <!-- ... other patient details ... -->
+<p><strong>Bed:</strong> 
+    {% if patient.bed %}
+        {{ patient.bed.number }} in {{ patient.bed.ward.name }}
+    {% else %}
+        Not assigned
+        <a href="{% url 'assign_bed' patient.id %}">Assign Bed</a>
+    {% endif %}
+</p>
 {% endblock %}
