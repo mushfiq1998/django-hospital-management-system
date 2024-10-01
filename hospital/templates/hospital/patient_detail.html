@@ -1,16 +1,94 @@
 {% extends 'hospital/base.html' %}
 
 {% block content %}
-<h2>Patient Details</h2>
-<p><strong>Name:</strong> {{ patient.name }}</p>
-<p><strong>Type:</strong> {{ patient.get_patient_type_display }}</p>
-<!-- ... other patient details ... -->
-<p><strong>Bed:</strong> 
-    {% if patient.bed %}
-        {{ patient.bed.number }} in {{ patient.bed.ward.name }}
-    {% else %}
-        Not assigned
-        <a href="{% url 'assign_bed' patient.id %}">Assign Bed</a>
-    {% endif %}
-</p>
+<div class="patient-details">
+    <h2>Patient Details</h2>
+    <div class="patient-info">
+        <div class="patient-photo">
+            {% if patient.photo %}
+                <img src="{{ patient.photo.url }}" alt="{{ patient.name }}" class="patient-image">
+            {% else %}
+                <div class="no-photo">No Photo Available</div>
+            {% endif %}
+        </div>
+        <div class="patient-data">
+            <p><strong>Name:</strong> {{ patient.name }}</p>
+            <p><strong>Date of Birth:</strong> {{ patient.date_of_birth|default_if_none:"N/A" }}</p>
+            <p><strong>Gender:</strong> {{ patient.get_gender_display|default_if_none:"N/A" }}</p>
+            <p><strong>Phone Number:</strong> {{ patient.phone_number|default_if_none:"N/A" }}</p>
+            <p><strong>Email:</strong> {{ patient.email|default_if_none:"N/A" }}</p>
+            <p><strong>Address:</strong> {{ patient.address|default_if_none:"N/A" }}</p>
+            <p><strong>Patient Type:</strong> {{ patient.get_patient_type_display }}</p>
+            <p><strong>Bed:</strong> 
+                {% if patient.bed %}
+                    {{ patient.bed.number }} in {{ patient.bed.ward.name }}
+                {% else %}
+                    Not assigned
+                    <a href="{% url 'assign_bed' patient.id %}" class="btn btn-secondary btn-sm">Assign Bed</a>
+                {% endif %}
+            </p>
+            <p><strong>Admission Status:</strong> 
+                {% if patient.is_admitted %}
+                    Admitted on {{ patient.admission_date }}
+                {% else %}
+                    Not admitted
+                    <a href="{% url 'admit_patient' patient.id %}" class="btn btn-primary btn-sm">Admit Patient</a>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .patient-details {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .patient-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .patient-photo {
+        flex: 0 0 200px;
+    }
+    .patient-image, .no-photo {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+    .no-photo {
+        background-color: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+    }
+    .patient-data {
+        flex: 1;
+    }
+    .patient-data p {
+        margin-bottom: 10px;
+    }
+    .btn {
+        display: inline-block;
+        padding: 5px 10px;
+        font-size: 14px;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+    .btn-primary {
+        background-color: #4CAF50;
+        color: white;
+    }
+    .btn-secondary {
+        background-color: #45a049;
+        color: white;
+    }
+</style>
 {% endblock %}

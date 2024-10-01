@@ -20,6 +20,15 @@ class Ward(models.Model):
         return self.name
 
 
+class Bed(models.Model):
+    number = models.CharField(max_length=10)
+    ward = models.ForeignKey(Ward, on_delete=models.CASCADE, related_name='beds')
+    is_occupied = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Bed {self.number} in {self.ward.name}"
+
+
 class Patient(models.Model):
     PATIENT_TYPES = [
         ('indoor', 'Indoor'),
@@ -35,20 +44,14 @@ class Patient(models.Model):
     photo = models.ImageField(upload_to='patient_photos/', null=True, blank=True)
     patient_type = models.CharField(max_length=7, 
                                     choices=PATIENT_TYPES, default='outdoor')
+    is_admitted = models.BooleanField(default=False)
+    admission_date = models.DateTimeField(null=True, blank=True)
+    discharge_date = models.DateTimeField(null=True, blank=True)
+    bed = models.OneToOneField(Bed, on_delete=models.SET_NULL, 
+                               null=True, blank=True, related_name='current_patient')
 
     def __str__(self):
         return self.name
-
-
-class Bed(models.Model):
-    number = models.CharField(max_length=10)
-    ward = models.ForeignKey(Ward, on_delete=models.CASCADE, related_name='beds')
-    is_occupied = models.BooleanField(default=False)
-    patient = models.OneToOneField(Patient, on_delete=models.SET_NULL, 
-                                   null=True, blank=True, related_name='bed')
-
-    def __str__(self):
-        return f"Bed {self.number} in {self.ward.name}"
 
 
 class Doctor(models.Model):

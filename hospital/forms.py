@@ -34,4 +34,9 @@ class WardForm(forms.ModelForm):
 class BedForm(forms.ModelForm):
     class Meta:
         model = Bed
-        fields = ['number', 'ward', 'is_occupied', 'patient']
+        fields = ['number', 'ward', 'is_occupied']
+        widgets = {
+            'number': forms.TextInput(attrs={'class': 'form-control'}),
+            'ward': forms.Select(attrs={'class': 'form-control'}),
+            'is_occupied': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }

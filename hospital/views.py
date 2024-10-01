@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView
+from django.utils import timezone
 
 # Dashboard View
 @login_required
@@ -19,6 +20,9 @@ def dashboard(request):
     outdoor_patients_count = Patient.objects.filter(patient_type='outdoor').count()
     doctors_count = Doctor.objects.count()
     appointments_count = Appointment.objects.count()
+    wards_count = Ward.objects.count()
+    beds_count = Bed.objects.count()
+    patients = Patient.objects.all()
     context = {
         'employees_count': employees_count,
         'patients_count': patients_count,
@@ -26,6 +30,9 @@ def dashboard(request):
         'outdoor_patients_count': outdoor_patients_count,
         'doctors_count': doctors_count,
         'appointments_count': appointments_count,
+        'wards_count': wards_count,
+        'beds_count': beds_count,
+        'patients': patients,
     }
     return render(request, 'hospital/dashboard.html', context)
 
@@ -127,6 +134,52 @@ def delete_object(request, model, pk, redirect_url):
 @login_required
 def patient_delete(request, pk):
     return delete_object(request, Patient, pk, 'patient_list')
+
+
+@login_required
+def admit_patient(request, pk):
+    if pk == 0:
+        # This is called from the dashboard
+        patient_id = request.GET.get('patient_id')
+        if patient_id:
+            return redirect('admit_patient', pk=patient_id)
+        else:
+            messages.error(request, "Please select a patient to admit.")
+            return redirect('dashboard')
+    
+    patient = get_object_or_404(Patient, pk=pk)
+    if request.method == 'POST':
+        bed_id = request.POST.get('bed_id')
+        if bed_id:
+            bed = get_object_or_404(Bed, pk=bed_id)
+            if not bed.is_occupied:
+                # Check if the patient is already assigned to a bed
+                if patient.bed:
+                    # If so, free up the old bed
+                    old_bed = patient.bed
+                    old_bed.is_occupied = False
+                    old_bed.save()
+                
+                patient.is_admitted = True
+                patient.admission_date = timezone.now()
+                patient.bed = bed
+                patient.save()
+                
+                bed.is_occupied = True
+                bed.save()
+                
+                messages.success(request, 
+                    f"Patient {patient.name} has been admitted and assigned to bed {bed.number}.")
+                return redirect('patient_detail', pk=patient.pk)
+            else:
+                messages.error(request, "The selected bed is already occupied.")
+        else:
+            messages.error(request, "Please select a bed for admission.")
+    
+    available_beds = Bed.objects.filter(is_occupied=False)
+    context = {'patient': patient, 'available_beds': available_beds}
+    return render(request, 'hospital/admit_patient.html', context)
+
 
 # .......................................................................
 # Employee Views 

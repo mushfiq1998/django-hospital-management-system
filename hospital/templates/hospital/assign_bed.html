@@ -1,14 +1,68 @@
 {% extends 'hospital/base.html' %}
 
 {% block content %}
-<h2>Assign Bed to {{ patient.name }}</h2>
-<form method="post">
-    {% csrf_token %}
-    <select name="bed_id">
-        {% for bed in available_beds %}
-            <option value="{{ bed.id }}">{{ bed.number }} in {{ bed.ward.name }}</option>
-        {% endfor %}
-    </select>
-    <button type="submit">Assign Bed</button>
-</form>
+<div class="assign-bed-container">
+    <h2 class="assign-bed-title">Assign Bed to {{ patient.name }}</h2>
+    <form method="post" class="assign-bed-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="bed-select" class="form-label">Select a bed:</label>
+            <select name="bed_id" id="bed-select" class="form-select">
+                <option value="" disabled selected>Choose a bed</option>
+                {% for bed in available_beds %}
+                    <option value="{{ bed.id }}">{{ bed.number }} in {{ bed.ward.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Assign Bed</button>
+    </form>
+</div>
+
+<style>
+    .assign-bed-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .assign-bed-title {
+        color: #4CAF50;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .assign-bed-form {
+        display: flex;
+        flex-direction: column;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        display: block;
+    }
+    .form-select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+    .btn-primary {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+    }
+    .btn-primary:hover {
+        background-color: #45a049;
+    }
+</style>
 {% endblock %}
