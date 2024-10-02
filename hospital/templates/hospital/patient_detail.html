@@ -6,7 +6,8 @@
     <div class="patient-info">
         <div class="patient-photo">
             {% if patient.photo %}
-                <img src="{{ patient.photo.url }}" alt="{{ patient.name }}" class="patient-image">
+                <img src="{{ patient.photo.url }}" alt="{{ patient.name }}" 
+                class="patient-image">
             {% else %}
                 <div class="no-photo">No Photo Available</div>
             {% endif %}

@@ -1,5 +1,6 @@
 from django import forms
-from .models import Patient, Employee, Doctor, Appointment, Ward, Bed
+from .models import Patient, Employee, Doctor, Appointment, Ward, Bed, OTBooking
+from django.contrib.auth.models import User
 
 class PatientForm(forms.ModelForm):
     class Meta:
@@ -40,3 +41,16 @@ class BedForm(forms.ModelForm):
             'ward': forms.Select(attrs={'class': 'form-control'}),
             'is_occupied': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+class OTBookingForm(forms.ModelForm):
+    class Meta:
+        model = OTBooking
+        fields = ['patient', 'doctor', 'scheduled_time', 'procedure', 'status', 'notes']
+        widgets = {
+            'scheduled_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']

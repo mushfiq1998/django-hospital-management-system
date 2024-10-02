@@ -53,4 +53,16 @@ urlpatterns = [
     path('beds/<int:pk>/update/', views.bed_update, name='bed_update'),
     path('patients/<int:patient_id>/assign_bed/', views.assign_bed, name='assign_bed'),
     path('beds/<int:pk>/delete/', views.bed_delete, name='bed_delete'),
+
+    # OT Booking URLs
+    path('ot-bookings/', views.ot_booking_list, name='ot_booking_list'),
+    path('ot-bookings/create/', views.ot_booking_create, name='ot_booking_create'),
+    path('ot-bookings/<int:pk>/update/', views.ot_booking_update, name='ot_booking_update'),
+    path('ot-bookings/<int:pk>/delete/', views.ot_booking_delete, name='ot_booking_delete'),
+    path('ot-bookings/<int:pk>/', views.ot_booking_detail, name='ot_booking_detail'),
+
+    # Account Management URLs
+    path('account/', views.account_management, name='account_management'),
+    path('account/change-password/', views.change_password, name='change_password'),
+    path('account/profile/', views.profile, name='profile'),
 ]

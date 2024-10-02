@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
-from .models import Patient, Employee, Doctor, Appointment, Ward, Bed
-from .forms import PatientForm, EmployeeForm, DoctorForm, AppointmentForm, WardForm, BedForm
+from .models import Patient, Employee, Doctor, Appointment, Ward, Bed, OTBooking
+from .forms import PatientForm, EmployeeForm, DoctorForm, AppointmentForm, WardForm, BedForm, OTBookingForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
@@ -10,6 +10,10 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView
 from django.utils import timezone
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.models import User
+from .forms import UserProfileForm
 
 # Dashboard View
 @login_required
@@ -23,6 +27,10 @@ def dashboard(request):
     wards_count = Ward.objects.count()
     beds_count = Bed.objects.count()
     patients = Patient.objects.all()
+    # Add OT booking information
+    upcoming_ot_bookings = OTBooking.objects.filter(status='scheduled', scheduled_time__gt=timezone.now()).count()
+    ongoing_ot_bookings = OTBooking.objects.filter(status='in_progress').count()
+    
     context = {
         'employees_count': employees_count,
         'patients_count': patients_count,
@@ -33,6 +41,8 @@ def dashboard(request):
         'wards_count': wards_count,
         'beds_count': beds_count,
         'patients': patients,
+        'upcoming_ot_bookings': upcoming_ot_bookings,
+        'ongoing_ot_bookings': ongoing_ot_bookings,
     }
     return render(request, 'hospital/dashboard.html', context)
 
@@ -415,8 +425,10 @@ def assign_bed(request, patient_id):
         else:
             messages.error(request, "This bed is already occupied")
         return redirect('patient_detail', pk=patient_id)
+    
     available_beds = Bed.objects.filter(is_occupied=False)
-    return render(request, 'hospital/assign_bed.html', {'patient': patient, 'available_beds': available_beds})
+    context = {'patient': patient, 'available_beds': available_beds}
+    return render(request, 'hospital/assign_bed.html', context)
 
 class WardDeleteView(DeleteView):
     model = Ward
@@ -431,3 +443,80 @@ ward_delete = WardDeleteView.as_view()
 @login_required
 def bed_delete(request, pk):
     return delete_object(request, Bed, pk, 'bed_list')
+
+@login_required
+def ot_booking_list(request):
+    bookings = OTBooking.objects.all().order_by('scheduled_time')
+    return render(request, 'hospital/ot_booking_list.html', {'bookings': bookings})
+
+@login_required
+def ot_booking_create(request):
+    if request.method == 'POST':
+        form = OTBookingForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'OT Booking created successfully.')
+            return redirect('ot_booking_list')
+    else:
+        form = OTBookingForm()
+    return render(request, 'hospital/ot_booking_form.html', {'form': form})
+
+@login_required
+def ot_booking_update(request, pk):
+    booking = get_object_or_404(OTBooking, pk=pk)
+    if request.method == 'POST':
+        form = OTBookingForm(request.POST, instance=booking)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'OT Booking updated successfully.')
+            return redirect('ot_booking_list')
+    else:
+        form = OTBookingForm(instance=booking)
+    return render(request, 'hospital/ot_booking_form.html', {'form': form})
+
+@login_required
+def ot_booking_delete(request, pk):
+    booking = get_object_or_404(OTBooking, pk=pk)
+    if request.method == 'POST':
+        booking.delete()
+        messages.success(request, 'OT Booking deleted successfully.')
+        return redirect('ot_booking_list')
+    return render(request, 'hospital/ot_booking_confirm_delete.html', {'booking': booking})
+
+@login_required
+def ot_booking_detail(request, pk):
+    booking = get_object_or_404(OTBooking, pk=pk)
+    return render(request, 'hospital/ot_booking_detail.html', {'booking': booking})
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('dashboard')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'hospital/change_password.html', {'form': form})
+
+@login_required
+def profile(request):
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your profile was successfully updated!')
+            return redirect('dashboard')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = UserProfileForm(instance=request.user)
+    return render(request, 'hospital/profile.html', {'form': form})
+
+@login_required
+def account_management(request):
+    return render(request, 'hospital/account_management.html')

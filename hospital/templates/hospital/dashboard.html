@@ -112,6 +112,7 @@
     <div class="container">
         <h1 style="text-align: center;">Hospital Management Dashboard</h1>
         <a href="{% url 'logout' %}" class="logout-link">Logout</a>
+        <a href="{% url 'account_management' %}" class="account-management-link">Account Management</a>
         
         <div class="dashboard-grid">
             <div class="card">
@@ -186,6 +187,25 @@
                 <a href="{% url 'bed_list' %}" class="card-link">View All Beds</a>
             </div>
 
+            <div class="card">
+                <div class="card-header">OT Bookings</div>
+                <div class="card-body">
+                    <div class="card-icon"><i class="fas fa-procedures"></i></div>
+                    <p>Manage Operation Theater bookings and schedules.</p>
+                    <div class="stats">
+                        <span><i class="fas fa-calendar-check"></i> 
+                            {{upcoming_ot_bookings}} Upcoming
+                        </span>
+                        <span><i class="fas fa-spinner"></i> 
+                            {{ongoing_ot_bookings}} Ongoing
+                        </span>
+                    </div>
+                </div>
+                <a href="{% url 'ot_booking_list' %}" class="card-link">
+                    View OT Bookings
+                </a>
+            </div>
+
             <div class="card quick-admission">
                 <div class="card-header">Quick Patient Admission</div>
                 <div class="card-body">
@@ -195,7 +215,9 @@
                         <select name="patient_id" required>
                             <option value="">Select a patient</option>
                             {% for patient in patients %}
-                                <option value="{{ patient.id }}">{{ patient.name }}</option>
+                                <option value="{{ patient.id }}">
+                                    {{ patient.name }}
+                                </option>
                             {% endfor %}
                         </select>
                         <input type="submit" value="Admit Patient">

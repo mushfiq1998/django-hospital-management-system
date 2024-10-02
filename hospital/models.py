@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 class Employee(models.Model):
     name = models.CharField(max_length=100)
@@ -73,3 +74,31 @@ class Appointment(models.Model):
 
     def __str__(self):
         return f"{self.patient.name} - {self.doctor.name} - {self.date} {self.time}"
+
+
+class OTBooking(models.Model):
+    STATUS_CHOICES = [
+        ('scheduled', 'Scheduled'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    scheduled_time = models.DateTimeField()
+    end_time = models.DateTimeField(null=True, blank=True)
+    procedure = models.CharField(max_length=200)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='scheduled')
+    notes = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.patient.name} - {self.procedure} - {self.scheduled_time}"
+
+    @property
+    def is_ongoing(self):
+        return self.status == 'in_progress'
+
+    @property
+    def is_upcoming(self):
+        return self.status == 'scheduled' and self.scheduled_time > timezone.now()
