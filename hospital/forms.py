@@ -1,5 +1,5 @@
 from django import forms
-from .models import Patient, Employee, Doctor, Appointment, Ward, Bed, OTBooking, Payroll
+from .models import Patient, Employee, Doctor, Appointment, Ward, Bed, OTBooking, Payroll, PatientBilling
 from django.contrib.auth.models import User
 
 class PatientForm(forms.ModelForm):
@@ -61,4 +61,12 @@ class PayrollForm(forms.ModelForm):
         fields = ['employee', 'salary', 'bonus', 'deductions', 'pay_date']
         widgets = {
             'pay_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+class PatientBillingForm(forms.ModelForm):
+    class Meta:
+        model = PatientBilling
+        fields = ['patient', 'total_amount', 'payment_status', 'description']
+        widgets = {
+            'billing_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }

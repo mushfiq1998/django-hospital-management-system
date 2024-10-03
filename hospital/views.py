@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
-from .models import Patient, Employee, Doctor, Appointment, Ward, Bed, OTBooking, Payroll
+from .models import Patient, Employee, Doctor, Appointment, Ward, Bed, OTBooking, Payroll, PatientBilling
 from .forms import PatientForm, EmployeeForm, DoctorForm, AppointmentForm, \
-WardForm, BedForm, OTBookingForm
+WardForm, BedForm, OTBookingForm, PatientBillingForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
@@ -16,6 +16,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
 from .forms import UserProfileForm
 from .forms import PayrollForm
+from django.db.models import Sum
 
 # Dashboard View
 @login_required
@@ -34,6 +35,10 @@ def dashboard(request):
     ongoing_ot_bookings = OTBooking.objects.filter(status='in_progress').count()
     payroll_count = Payroll.objects.count()
     
+    # Add billing information
+    total_billing = PatientBilling.objects.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+    unpaid_billing = PatientBilling.objects.filter(payment_status='unpaid').aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+    
     context = {
         'employees_count': employees_count,
         'patients_count': patients_count,
@@ -47,6 +52,8 @@ def dashboard(request):
         'upcoming_ot_bookings': upcoming_ot_bookings,
         'ongoing_ot_bookings': ongoing_ot_bookings,
         'payroll_count': payroll_count,
+        'total_billing': total_billing,
+        'unpaid_billing': unpaid_billing,
     }
     return render(request, 'hospital/dashboard.html', context)
 
@@ -572,3 +579,48 @@ def payroll_delete(request, pk):
         messages.success(request, 'Payroll record deleted successfully.')
         return redirect('payroll_list')
     return render(request, 'hospital/payroll_confirm_delete.html', {'payroll': payroll})
+
+# Add these new views for patient billing
+@login_required
+def patient_billing_list(request):
+    billings = PatientBilling.objects.all().order_by('-billing_date')
+    return render(request, 'hospital/patient_billing_list.html', {'billings': billings})
+
+@login_required
+def patient_billing_add(request):
+    if request.method == 'POST':
+        form = PatientBillingForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Patient billing record added successfully.')
+            return redirect('patient_billing_list')
+    else:
+        form = PatientBillingForm()
+    return render(request, 'hospital/patient_billing_form.html', {'form': form})
+
+@login_required
+def patient_billing_edit(request, pk):
+    billing = get_object_or_404(PatientBilling, pk=pk)
+    if request.method == 'POST':
+        form = PatientBillingForm(request.POST, instance=billing)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Patient billing record updated successfully.')
+            return redirect('patient_billing_list')
+    else:
+        form = PatientBillingForm(instance=billing)
+    return render(request, 'hospital/patient_billing_form.html', {'form': form})
+
+@login_required
+def patient_billing_view(request, pk):
+    billing = get_object_or_404(PatientBilling, pk=pk)
+    return render(request, 'hospital/patient_billing_detail.html', {'billing': billing})
+
+@login_required
+def patient_billing_delete(request, pk):
+    billing = get_object_or_404(PatientBilling, pk=pk)
+    if request.method == 'POST':
+        billing.delete()
+        messages.success(request, 'Patient billing record deleted successfully.')
+        return redirect('patient_billing_list')
+    return render(request, 'hospital/patient_billing_confirm_delete.html', {'billing': billing})

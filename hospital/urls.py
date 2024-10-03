@@ -73,4 +73,11 @@ urlpatterns = [
     path('payroll/<int:pk>/edit/', views.payroll_edit, name='payroll_edit'),
     path('payroll/<int:pk>/', views.payroll_view, name='payroll_view'),
     path('payroll/<int:pk>/delete/', views.payroll_delete, name='payroll_delete'),
+
+    # Patient Billing URLs
+    path('patient-billing/', views.patient_billing_list, name='patient_billing_list'),
+    path('patient-billing/add/', views.patient_billing_add, name='patient_billing_add'),
+    path('patient-billing/<int:pk>/', views.patient_billing_view, name='patient_billing_view'),
+    path('patient-billing/<int:pk>/edit/', views.patient_billing_edit, name='patient_billing_edit'),
+    path('patient-billing/<int:pk>/delete/', views.patient_billing_delete, name='patient_billing_delete'),
 ]

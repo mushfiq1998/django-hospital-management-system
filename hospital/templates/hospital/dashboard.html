@@ -238,7 +238,6 @@
                 </div>
             </div>
 
-            <!-- Add this card to your dashboard grid -->
             <div class="card">
                 <div class="card-header">Payroll</div>
                 <div class="card-body">
@@ -250,6 +249,20 @@
                 </div>
                 <a href="{% url 'payroll_list' %}" class="card-link">View Payroll</a>
             </div>
+
+            <div class="card">
+                <div class="card-header">Patient Billing</div>
+                <div class="card-body">
+                    <div class="card-icon"><i class="fas fa-dollar-sign"></i></div>
+                    <p>Manage patient billing and payment information.</p>
+                    <div class="stats">
+                        <span><i class="fas fa-money-bill-wave"></i> Total: ${{ total_billing|floatformat:2 }}</span>
+                        <span><i class="fas fa-exclamation-triangle"></i> Unpaid: ${{ unpaid_billing|floatformat:2 }}</span>
+                    </div>
+                </div>
+                <a href="{% url 'patient_billing_list' %}" class="card-link">View Patient Billing</a>
+            </div>
+
         </div>
     </div>
 </body>
