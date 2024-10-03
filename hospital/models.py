@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 class Employee(models.Model):
     name = models.CharField(max_length=100)
@@ -102,3 +103,17 @@ class OTBooking(models.Model):
     @property
     def is_upcoming(self):
         return self.status == 'scheduled' and self.scheduled_time > timezone.now()
+
+
+class Payroll(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    salary = models.DecimalField(max_digits=10, decimal_places=2)
+    bonus = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    deductions = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    pay_date = models.DateField()
+    
+    def total_pay(self):
+        return self.salary + self.bonus - self.deductions
+
+    def __str__(self):
+        return f"{self.employee.username} - {self.pay_date}"

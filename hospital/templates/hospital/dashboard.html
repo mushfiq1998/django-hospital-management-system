@@ -106,13 +106,26 @@
         .quick-admission input[type="submit"]:hover {
             background-color: #45a049;
         }
+        .account-management-link {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 12px;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .account-management-link:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1 style="text-align: center;">Hospital Management Dashboard</h1>
-        <a href="{% url 'logout' %}" class="logout-link">Logout</a>
         <a href="{% url 'account_management' %}" class="account-management-link">Account Management</a>
+        <a href="{% url 'logout' %}" class="logout-link">Logout</a>
         
         <div class="dashboard-grid">
             <div class="card">
@@ -223,6 +236,19 @@
                         <input type="submit" value="Admit Patient">
                     </form>
                 </div>
+            </div>
+
+            <!-- Add this card to your dashboard grid -->
+            <div class="card">
+                <div class="card-header">Payroll</div>
+                <div class="card-body">
+                    <div class="card-icon"><i class="fas fa-money-check-alt"></i></div>
+                    <p>Manage employee salaries, bonuses, and deductions.</p>
+                    <div class="stats">
+                        <span><i class="fas fa-file-invoice-dollar"></i> {{ payroll_count }} Payroll Records</span>
+                    </div>
+                </div>
+                <a href="{% url 'payroll_list' %}" class="card-link">View Payroll</a>
             </div>
         </div>
     </div>

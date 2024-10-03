@@ -65,4 +65,12 @@ urlpatterns = [
     path('account/', views.account_management, name='account_management'),
     path('account/change-password/', views.change_password, name='change_password'),
     path('account/profile/', views.profile, name='profile'),
+    path('account/view-profile/', views.view_profile, name='view_profile'),
+
+    # Payroll URL
+    path('payroll/', views.payroll_list, name='payroll_list'),
+    path('payroll/add/', views.payroll_add, name='payroll_add'),
+    path('payroll/<int:pk>/edit/', views.payroll_edit, name='payroll_edit'),
+    path('payroll/<int:pk>/', views.payroll_view, name='payroll_view'),
+    path('payroll/<int:pk>/delete/', views.payroll_delete, name='payroll_delete'),
 ]

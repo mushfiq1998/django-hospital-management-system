@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
-from .models import Patient, Employee, Doctor, Appointment, Ward, Bed, OTBooking
-from .forms import PatientForm, EmployeeForm, DoctorForm, AppointmentForm, WardForm, BedForm, OTBookingForm
+from .models import Patient, Employee, Doctor, Appointment, Ward, Bed, OTBooking, Payroll
+from .forms import PatientForm, EmployeeForm, DoctorForm, AppointmentForm, \
+WardForm, BedForm, OTBookingForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
@@ -14,6 +15,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
 from .forms import UserProfileForm
+from .forms import PayrollForm
 
 # Dashboard View
 @login_required
@@ -30,6 +32,7 @@ def dashboard(request):
     # Add OT booking information
     upcoming_ot_bookings = OTBooking.objects.filter(status='scheduled', scheduled_time__gt=timezone.now()).count()
     ongoing_ot_bookings = OTBooking.objects.filter(status='in_progress').count()
+    payroll_count = Payroll.objects.count()
     
     context = {
         'employees_count': employees_count,
@@ -43,6 +46,7 @@ def dashboard(request):
         'patients': patients,
         'upcoming_ot_bookings': upcoming_ot_bookings,
         'ongoing_ot_bookings': ongoing_ot_bookings,
+        'payroll_count': payroll_count,
     }
     return render(request, 'hospital/dashboard.html', context)
 
@@ -494,7 +498,7 @@ def change_password(request):
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
-            update_session_auth_hash(request, user)  # Important!
+            update_session_auth_hash(request, user) 
             messages.success(request, 'Your password was successfully updated!')
             return redirect('dashboard')
         else:
@@ -520,3 +524,51 @@ def profile(request):
 @login_required
 def account_management(request):
     return render(request, 'hospital/account_management.html')
+
+@login_required
+def view_profile(request):
+    return render(request, 'hospital/view_profile.html', {'user': request.user})
+
+@login_required
+def payroll_list(request):
+    payrolls = Payroll.objects.all().order_by('-pay_date')
+    return render(request, 'hospital/payroll_list.html', {'payrolls': payrolls})
+
+@login_required
+def payroll_add(request):
+    if request.method == 'POST':
+        form = PayrollForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Payroll record added successfully.')
+            return redirect('payroll_list')
+    else:
+        form = PayrollForm()
+    return render(request, 'hospital/payroll_form.html', {'form': form})
+
+@login_required
+def payroll_edit(request, pk):
+    payroll = get_object_or_404(Payroll, pk=pk)
+    if request.method == 'POST':
+        form = PayrollForm(request.POST, instance=payroll)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Payroll record updated successfully.')
+            return redirect('payroll_list')
+    else:
+        form = PayrollForm(instance=payroll)
+    return render(request, 'hospital/payroll_form.html', {'form': form})
+
+@login_required
+def payroll_view(request, pk):
+    payroll = get_object_or_404(Payroll, pk=pk)
+    return render(request, 'hospital/payroll_detail.html', {'payroll': payroll})
+
+@login_required
+def payroll_delete(request, pk):
+    payroll = get_object_or_404(Payroll, pk=pk)
+    if request.method == 'POST':
+        payroll.delete()
+        messages.success(request, 'Payroll record deleted successfully.')
+        return redirect('payroll_list')
+    return render(request, 'hospital/payroll_confirm_delete.html', {'payroll': payroll})
